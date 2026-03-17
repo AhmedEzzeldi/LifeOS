@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Your Life Organizer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f5f5f3;
+  --color-background-tertiary:#ebebea;
+  --color-text-primary:#1a1a18;
+  --color-text-secondary:#6b6b67;
+  --color-text-tertiary:#a0a09c;
+  --color-border-tertiary:rgba(0,0,0,0.12);
+  --color-border-secondary:rgba(0,0,0,0.22);
+  --color-border-primary:rgba(0,0,0,0.32);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --border-radius-xl:16px;
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --color-background-primary:#1c1c1a;
+  --color-background-secondary:#242422;
+  --color-background-tertiary:#2c2c2a;
+  --color-text-primary:#f0f0ec;
+  --color-text-secondary:#9a9a94;
+  --color-text-tertiary:#6a6a64;
+  --color-border-tertiary:rgba(255,255,255,0.1);
+  --color-border-secondary:rgba(255,255,255,0.18);
+  --color-border-primary:rgba(255,255,255,0.28);
+}}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);min-height:100vh;padding:1.5rem;display:flex;align-items:flex-start;justify-content:center}
+.lo-app{width:100%;max-width:1000px;height:840px;display:flex;border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-tertiary);overflow:hidden;background:var(--color-background-primary);position:relative}
+.lo-sidebar{width:192px;flex-shrink:0;background:var(--color-background-secondary);border-right:.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.lo-brand{padding:1.125rem 1rem .875rem;border-bottom:.5px solid var(--color-border-tertiary)}
+.lo-brand-name{font-size:17px;font-weight:500;color:var(--color-text-primary);letter-spacing:-.03em}
+.lo-brand-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.lo-nav{flex:1;padding:.5rem 0;overflow-y:auto}
+.lo-ni{display:flex;align-items:center;gap:9px;padding:8px 1rem;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-right:2px solid transparent;transition:all .12s;user-select:none}
+.lo-ni:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.lo-ni.lo-act{color:var(--color-text-primary);font-weight:500;background:var(--color-background-primary);border-right-color:#E8782B}
+.lo-ni svg{opacity:.65;flex-shrink:0}.lo-ni.lo-act svg{opacity:1}
+.lo-sb-foot{padding:.875rem 1rem;border-top:.5px solid var(--color-border-tertiary)}
+.lo-yr-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-tertiary);margin-bottom:5px}
+.lo-yr-bar{height:4px;background:var(--color-background-tertiary);border-radius:999px;overflow:hidden}
+.lo-yr-fill{height:100%;background:#E8782B;border-radius:999px}
+.lo-main{flex:1;overflow-y:auto;background:var(--color-background-primary)}
+.lo-panel{display:none;padding:1.5rem;min-height:100%}
+.lo-panel.lo-act{display:block}
+.lo-ph{margin-bottom:1.5rem}
+.lo-pt{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.lo-ps{font-size:13px;color:var(--color-text-secondary);margin-top:3px}
+.lo-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-tertiary);padding:1rem 1.25rem;margin-bottom:1rem}
+.lo-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.lo-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.lo-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}
+.lo-met{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem 1rem}
+.lo-ml{font-size:12px;color:var(--color-text-secondary)}
+.lo-mv{font-size:26px;font-weight:500;color:var(--color-text-primary);line-height:1.1}
+.lo-ms{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.lo-sl{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem}
+.lo-prog{height:6px;background:var(--color-background-tertiary);border-radius:999px;overflow:hidden}
+.lo-pf{height:100%;background:#E8782B;border-radius:999px;transition:width .4s}
+.lo-pf.g{background:#639922}
+.lo-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);font-size:13px;cursor:pointer;transition:all .12s;font-family:inherit;line-height:1.4}
+.lo-btn:hover{background:var(--color-background-secondary)}
+.lo-btn.p{background:#E8782B;border-color:#E8782B;color:#fff}
+.lo-btn.p:hover{background:#d0691f;border-color:#d0691f}
+.lo-btn.s{padding:4px 10px;font-size:12px}
+.lo-btn.d{color:#993C1D;border-color:#F5C4B3}.lo-btn.d:hover{background:#FAECE7}
+input.li,select.li,textarea.li{font-family:inherit;font-size:13px;color:var(--color-text-primary);background:var(--color-background-primary);border:.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:7px 10px;width:100%;outline:none;transition:border-color .12s}
+input.li:focus,select.li:focus,textarea.li:focus{border-color:#E8782B}
+textarea.li{resize:vertical;min-height:72px}
+.lo-quote{padding:1rem 1.25rem;background:#FAEEDA;border-radius:var(--border-radius-lg);border:.5px solid #FAC775;margin-bottom:1.5rem}
+.lo-qt{font-size:14px;font-weight:500;color:#633806;line-height:1.5}
+.lo-qa{font-size:11px;color:#854F0B;margin-top:4px}
+.lo-task{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.lo-task:last-child{border-bottom:none}
+.lo-chk{width:18px;height:18px;border-radius:50%;border:.5px solid var(--color-border-secondary);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .12s;background:transparent}
+.lo-chk.dn{background:#E8782B;border-color:#E8782B}
+.lo-tb{flex:1;min-width:0}
+.lo-tt{font-size:13px;color:var(--color-text-primary);word-break:break-word}
+.lo-tt.dn{text-decoration:line-through;color:var(--color-text-tertiary)}
+.lo-tm{font-size:11px;color:var(--color-text-tertiary);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lo-bdg{display:inline-flex;align-items:center;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:500}
+.lo-bdg.hi{background:#FAECE7;color:#993C1D}.lo-bdg.md{background:#FAEEDA;color:#854F0B}.lo-bdg.lo{background:#EAF3DE;color:#3B6D11}
+.lo-bdg.ct{background:var(--color-background-secondary);color:var(--color-text-secondary);border:.5px solid var(--color-border-tertiary)}
+.lo-del{opacity:0;background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:14px;padding:0;line-height:1;transition:opacity .12s;flex-shrink:0;margin-top:1px}
+.lo-task:hover .lo-del,.lo-hr:hover .lo-del,.lo-gc:hover .lo-gc-del,.lo-nc:hover .lo-del{opacity:1}
+.lo-hr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.lo-hr:last-child{border-bottom:none}
+.lo-hchk{width:26px;height:26px;border-radius:50%;border:.5px solid var(--color-border-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;background:transparent}
+.lo-hchk.dn{background:#E8782B;border-color:#E8782B}
+.lo-hn{flex:1;font-size:13px;color:var(--color-text-primary)}
+.lo-hst{font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
+.lo-dots{display:flex;gap:3px;flex-wrap:wrap}
+.lo-dot{width:8px;height:8px;border-radius:50%;background:var(--color-background-tertiary)}
+.lo-dot.on{background:#E8782B}
+.lo-gc{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-tertiary);padding:1rem 1.25rem;margin-bottom:.75rem;position:relative}
+.lo-gc-del{position:absolute;top:10px;right:10px;opacity:0;background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:14px;padding:0}
+.lo-wg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.lo-dc{border-radius:var(--border-radius-md);border:.5px solid var(--color-border-tertiary);min-height:130px;overflow:hidden}
+.lo-dc.td{border-color:#E8782B}
+.lo-dh{font-size:11px;font-weight:500;text-align:center;padding:5px 4px 4px;background:var(--color-background-secondary);color:var(--color-text-secondary);border-bottom:.5px solid var(--color-border-tertiary)}
+.lo-dh.td{background:#FAEEDA;color:#633806}
+.lo-de{padding:3px}
+.lo-ec{font-size:10px;padding:2px 4px;border-radius:3px;margin-bottom:2px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.lo-ec.work{background:#E6F1FB;color:#0C447C}.lo-ec.personal{background:#EEEDFE;color:#3C3489}
+.lo-ec.health{background:#EAF3DE;color:#27500A}.lo-ec.reminder{background:#FAEEDA;color:#633806}
+.lo-addbtn{font-size:10px;color:var(--color-text-tertiary);cursor:pointer;padding:2px 4px;display:block;transition:color .12s;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+.lo-addbtn:hover{color:#E8782B}
+.lo-ng{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.lo-nc{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-tertiary);padding:1rem;position:relative;transition:border-color .12s}
+.lo-nc:hover{border-color:var(--color-border-secondary)}
+.lo-nc-ttl{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;word-break:break-word}
+.lo-nc-body{font-size:12px;color:var(--color-text-secondary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.lo-nc-date{font-size:10px;color:var(--color-text-tertiary);margin-top:.5rem}
+.lo-tdisp{font-size:72px;font-weight:500;color:var(--color-text-primary);text-align:center;letter-spacing:-3px;font-variant-numeric:tabular-nums;line-height:1}
+.lo-tmode{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-secondary);text-align:center;margin-top:8px}
+.lo-chip{padding:4px 12px;border-radius:999px;font-size:12px;border:.5px solid var(--color-border-secondary);cursor:pointer;color:var(--color-text-secondary);transition:all .12s;background:transparent}
+.lo-chip.ac{background:#FAEEDA;border-color:#E8782B;color:#633806;font-weight:500}
+.lo-mbg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center}
+.lo-modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-secondary);padding:1.5rem;width:340px;max-height:82vh;overflow-y:auto}
+.lo-mtitle{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
+.lo-fg{margin-bottom:.625rem}
+.lo-fl{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;display:block}
+.lo-fr{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.lo-empty{text-align:center;padding:2.5rem 1rem;color:var(--color-text-tertiary);font-size:13px}
+</style>
+</head>
+<body>
+<div class="lo-app" id="lo-app">
+  <nav class="lo-sidebar">
+    <div class="lo-brand">
+      <div class="lo-brand-name">LifeOS</div>
+      <div class="lo-brand-sub" id="lo-date"></div>
+    </div>
+    <div class="lo-nav" id="lo-nav"></div>
+    <div class="lo-sb-foot">
+      <div class="lo-yr-lbl"><span>2026</span><span id="lo-yp">0%</span></div>
+      <div class="lo-yr-bar"><div class="lo-yr-fill" id="lo-yf" style="width:0%"></div></div>
+    </div>
+  </nav>
+  <div class="lo-main" id="lo-main"></div>
+</div>
+
+<script>
+(function(){
+const S={tasks:[],goals:[],habits:[],hlog:{},notes:[],events:[],timer:{mode:'work',running:false,sec:25*60,sessions:0,wd:25,sd:5,ld:15},cur:'dashboard'};
+const KM={tasks:'lo2_tasks',goals:'lo2_goals',habits:'lo2_habits',hlog:'lo2_hlog',notes:'lo2_notes',events:'lo2_events'};
+let timerIv=null,_nc='amber';
+
+function lsGet(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+function loadAll(){
+  for(const[k,key]of Object.entries(KM)){const v=lsGet(key);if(v!==null)S[k]=v;}
+  const sess=lsGet('lo2_tsess');if(sess!==null)S.timer.sessions=parseInt(sess)||0;
+}
+function sv(k){lsSet(KM[k],S[k]);}
+function svk(k,v){lsSet(k,v);}
+
+function uid(){return Math.random().toString(36).slice(2,9);}
+function today(){return new Date().toISOString().split('T')[0];}
+function fd(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function yrp(){const n=new Date(),s=new Date(n.getFullYear(),0,1),e=new Date(n.getFullYear()+1,0,1);return Math.round(((n-s)/(e-s))*100);}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function greet(){const h=new Date().getHours();return h<12?'morning':h<17?'afternoon':'evening';}
+
+const Q=[
+  {t:"The secret of getting ahead is getting started.",a:"Mark Twain"},
+  {t:"Don't count the days. Make the days count.",a:"Muhammad Ali"},
+  {t:"It always seems impossible until it's done.",a:"Nelson Mandela"},
+  {t:"You don't have to be great to start, but you have to start to be great.",a:"Zig Ziglar"},
+  {t:"Focus on being productive instead of busy.",a:"Tim Ferriss"},
+  {t:"The future depends on what you do today.",a:"Mahatma Gandhi"},
+  {t:"Done is better than perfect.",a:"Sheryl Sandberg"},
+  {t:"Success is the sum of small efforts, repeated day in and day out.",a:"Robert Collier"},
+  {t:"Action is the foundational key to all success.",a:"Pablo Picasso"},
+  {t:"Wake up with determination. Go to bed with satisfaction.",a:"Anonymous"},
+  {t:"You are one decision away from a completely different life.",a:"Anonymous"},
+  {t:"Small steps every day.",a:"Anonymous"},
+];
+function dq(){return Q[new Date().getDate()%Q.length];}
+
+const IC={
+  dash:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>`,
+  tasks:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M2 7h7M2 10h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  goals:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>`,
+  plan:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2.5" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 1v3M9.5 1v3M1 5.5h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  hab:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7.5l3 3 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  notes:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2h10v8l-3 3H2V2z" stroke="currentColor" stroke-width="1.2"/><path d="M9 10v3M9 10h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  timer:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="8" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M7 5.5V8l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5 1.5h4M7 1.5v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  chk:`<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  plus:`<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  x:`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+};
+
+const NAV=[{id:'dashboard',l:'Dashboard',i:'dash'},{id:'tasks',l:'Tasks',i:'tasks'},{id:'goals',l:'Goals',i:'goals'},{id:'planner',l:'Planner',i:'plan'},{id:'habits',l:'Habits',i:'hab'},{id:'notes',l:'Notes',i:'notes'},{id:'timer',l:'Focus Timer',i:'timer'}];
+
+function bNav(){
+  document.getElementById('lo-nav').innerHTML=NAV.map(p=>`<div class="lo-ni${p.id===S.cur?' lo-act':''}" onclick="go('${p.id}')">${IC[p.i]}<span>${p.l}</span></div>`).join('');
+}
+function go(id){S.cur=id;bNav();rPanel(id);}
+window.go=go;
+
+function rPanel(id){
+  const rs={dashboard:rDash,tasks:rTasks,goals:rGoals,planner:rPlanner,habits:rHabits,notes:rNotes,timer:rTimer};
+  document.getElementById('lo-main').innerHTML=`<div class="lo-panel lo-act" id="panel-${id}">${rs[id]()}</div>`;
+}
+
+function rDash(){
+  const q=dq(),td=today();
+  const todayT=S.tasks.filter(t=>t.due===td&&!t.done);
+  const hdone=(S.hlog[td]||[]).length;
+  const yp=yrp();
+  const upcoming=S.tasks.filter(t=>!t.done).slice(0,5);
+  const todayEvts=S.events.filter(e=>e.date===td);
+  return`<div class="lo-ph"><div class="lo-pt">Good ${greet()}. Let's crush it. 🔥</div><div class="lo-ps">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div></div>
+<div class="lo-quote"><div class="lo-qt">"${q.t}"</div><div class="lo-qa">— ${q.a}</div></div>
+<div class="lo-sl">Today at a glance</div>
+<div class="lo-g4" style="margin-bottom:1.5rem">
+  <div class="lo-met"><div class="lo-ml">Tasks due today</div><div class="lo-mv">${todayT.length}</div><div class="lo-ms">need attention</div></div>
+  <div class="lo-met"><div class="lo-ml">Habits done</div><div class="lo-mv">${hdone}/${S.habits.length}</div><div class="lo-ms">today</div></div>
+  <div class="lo-met"><div class="lo-ml">Active goals</div><div class="lo-mv">${S.goals.filter(g=>g.p<100).length}</div><div class="lo-ms">in progress</div></div>
+  <div class="lo-met"><div class="lo-ml">Focus sessions</div><div class="lo-mv">${S.timer.sessions}</div><div class="lo-ms">total</div></div>
+</div>
+<div class="lo-sl">Year progress — 2026</div>
+<div class="lo-card">
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:8px"><span>Jan 1</span><span style="font-weight:500;color:#E8782B">${yp}% complete</span><span>Dec 31</span></div>
+  <div class="lo-prog"><div class="lo-pf" style="width:${yp}%"></div></div>
+  <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:6px">${365-Math.floor(365*yp/100)} days remaining — make them count</div>
+</div>
+${upcoming.length?`<div class="lo-sl">Open tasks</div><div class="lo-card" style="padding:0 1.25rem">${upcoming.map(t=>`<div class="lo-task"><div class="lo-chk${t.done?' dn':''}" onclick="togT('${t.id}')">${t.done?IC.chk:''}</div><div class="lo-tb"><div class="lo-tt${t.done?' dn':''}">${esc(t.title)}</div><div class="lo-tm">${t.priority?`<span class="lo-bdg ${t.priority==='high'?'hi':t.priority==='medium'?'md':'lo'}">${t.priority}</span>`:''} ${t.cat?`<span class="lo-bdg ct">${t.cat}</span>`:''} ${t.due?`<span>${fd(t.due)}</span>`:''}</div></div></div>`).join('')}</div>`:''}
+${todayEvts.length?`<div class="lo-sl">Today's events</div><div class="lo-card">${todayEvts.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:.5px solid var(--color-border-tertiary)"><span class="lo-ec ${e.type}" style="flex-shrink:0;display:inline-block">${esc(e.title)}</span>${e.time?`<span style="font-size:11px;color:var(--color-text-tertiary)">${e.time}</span>`:''}</div>`).join('')}</div>`:''}
+<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+  <button class="lo-btn p" onclick="showM('addTask')">${IC.plus} New Task</button>
+  <button class="lo-btn" onclick="go('goals')">My Goals</button>
+  <button class="lo-btn" onclick="go('planner')">Planner</button>
+  <button class="lo-btn" onclick="go('timer')">Focus Timer</button>
+</div>`;
+}
+
+window._tf={status:'all',cat:'all',pri:'all'};
+function rTasks(){
+  let ts=[...S.tasks];
+  const f=window._tf;
+  if(f.status==='active')ts=ts.filter(t=>!t.done);
+  if(f.status==='done')ts=ts.filter(t=>t.done);
+  if(f.cat!=='all')ts=ts.filter(t=>t.cat===f.cat);
+  if(f.pri!=='all')ts=ts.filter(t=>t.priority===f.pri);
+  ts.sort((a,b)=>{if(a.done!==b.done)return a.done?1:-1;if(a.due&&b.due)return a.due<b.due?-1:1;if(a.due)return-1;if(b.due)return 1;return 0;});
+  return`<div class="lo-ph"><div class="lo-pt">Tasks</div><div class="lo-ps">${S.tasks.filter(t=>!t.done).length} active · ${S.tasks.filter(t=>t.done).length} completed</div></div>
+<div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
+  <button class="lo-btn p s" onclick="showM('addTask')">${IC.plus} New Task</button>
+  <div style="flex:1"></div>
+  <select class="li" style="width:auto;font-size:12px" onchange="stf('status',this.value)"><option value="all">All</option><option value="active">Active</option><option value="done">Done</option></select>
+  <select class="li" style="width:auto;font-size:12px" onchange="stf('cat',this.value)"><option value="all">All categories</option>${['Work','Personal','Health','Finance','Learning','Creative'].map(c=>`<option value="${c}"${f.cat===c?' selected':''}>${c}</option>`).join('')}</select>
+  <select class="li" style="width:auto;font-size:12px" onchange="stf('pri',this.value)"><option value="all">All priorities</option>${['high','medium','low'].map(p=>`<option value="${p}"${f.pri===p?' selected':''}>${p[0].toUpperCase()+p.slice(1)}</option>`).join('')}</select>
+</div>
+<div class="lo-card" style="padding:0 1.25rem">${ts.length?ts.map(t=>`<div class="lo-task"><div class="lo-chk${t.done?' dn':''}" onclick="togT('${t.id}')">${t.done?IC.chk:''}</div><div class="lo-tb"><div class="lo-tt${t.done?' dn':''}">${esc(t.title)}</div><div class="lo-tm">${t.priority?`<span class="lo-bdg ${t.priority==='high'?'hi':t.priority==='medium'?'md':'lo'}">${t.priority}</span>`:''} ${t.cat?`<span class="lo-bdg ct">${esc(t.cat)}</span>`:''} ${t.due?`<span>${fd(t.due)}</span>`:''} ${t.notes?`<span style="font-style:italic">${esc(t.notes.slice(0,40))}${t.notes.length>40?'…':''}</span>`:''}</div></div><button class="lo-del" onclick="delT('${t.id}')">${IC.x}</button></div>`).join(''):`<div class="lo-empty">No tasks here — add one above</div>`}</div>`;
+}
+window.stf=(k,v)=>{window._tf[k]=v;rPanel('tasks');};
+window.togT=function(id){const t=S.tasks.find(t=>t.id===id);if(t){t.done=!t.done;sv('tasks');rPanel(S.cur);}};
+window.delT=function(id){S.tasks=S.tasks.filter(t=>t.id!==id);sv('tasks');rPanel(S.cur);};
+
+function rGoals(){
+  return`<div class="lo-ph"><div class="lo-pt">Goals for 2026</div><div class="lo-ps">${S.goals.filter(g=>g.p>=100).length} achieved · ${S.goals.filter(g=>g.p<100).length} in progress</div></div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:1rem"><button class="lo-btn p s" onclick="showM('addGoal')">${IC.plus} New Goal</button></div>
+${S.goals.length?S.goals.map(g=>`<div class="lo-gc"><button class="lo-gc-del" onclick="delG('${g.id}')">${IC.x}</button>
+<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px;padding-right:20px">
+  <div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">${esc(g.title)}</div>${g.desc?`<div style="font-size:12px;color:var(--color-text-secondary);margin-top:3px;line-height:1.4">${esc(g.desc)}</div>`:''}</div>
+  ${g.cat?`<span class="lo-bdg ct">${g.cat}</span>`:''}${g.dl?`<span style="font-size:11px;color:var(--color-text-tertiary)">${fd(g.dl)}</span>`:''}
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:.75rem">
+  <div class="lo-prog" style="flex:1"><div class="lo-pf${g.p>=100?' g':''}" style="width:${g.p}%"></div></div>
+  <span style="font-size:13px;font-weight:500;color:#E8782B;min-width:34px;text-align:right">${g.p}%</span>
+  <input type="range" min="0" max="100" value="${g.p}" style="width:80px" oninput="updG('${g.id}',this.value)">
+</div></div>`).join(''):
+`<div class="lo-empty" style="padding-top:3rem"><div style="font-size:40px;opacity:.25;margin-bottom:.75rem">◎</div>No goals yet<br><span style="font-size:12px">Set your big goals for 2026 and track every step</span></div>`}`;
+}
+window.updG=(id,v)=>{const g=S.goals.find(g=>g.id===id);if(g){g.p=parseInt(v);sv('goals');rPanel('goals');}};
+window.delG=(id)=>{S.goals=S.goals.filter(g=>g.id!==id);sv('goals');rPanel('goals');};
+
+let wOff=0;
+function getMon(off){const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);d.setDate(diff+off*7);d.setHours(0,0,0,0);return d;}
+function rPlanner(){
+  const mon=getMon(wOff),days=[];
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);days.push(d);}
+  const td=today();
+  const wl=`${mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${days[6].toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  return`<div class="lo-ph"><div class="lo-pt">Planner</div><div class="lo-ps">${wl}</div></div>
+<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+  <button class="lo-btn s" onclick="shW(-1)">← Prev</button>
+  <button class="lo-btn s" onclick="shW(0)">Today</button>
+  <button class="lo-btn s" onclick="shW(1)">Next →</button>
+  <div style="flex:1"></div>
+  <button class="lo-btn p s" onclick="showM('addEvent')">${IC.plus} New Event</button>
+</div>
+<div class="lo-wg">${days.map(d=>{
+  const ds=d.toISOString().split('T')[0],isTd=ds===td;
+  const evts=S.events.filter(e=>e.date===ds);
+  return`<div class="lo-dc${isTd?' td':''}"><div class="lo-dh${isTd?' td':''}"><div>${d.toLocaleDateString('en-US',{weekday:'short'})}</div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-top:1px">${d.getDate()}</div></div><div class="lo-de">${evts.map(e=>`<span class="lo-ec ${e.type}" onclick="delEv('${e.id}')" title="Delete: ${esc(e.title)}">${e.time?e.time+' ':''}${esc(e.title)}</span>`).join('')}<button class="lo-addbtn" onclick="showM('addEvent','${ds}')">+ add</button></div></div>`;
+}).join('')}</div>
+<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:.75rem">Tap an event to remove it. Tap "+ add" to add to that day.</div>`;
+}
+window.shW=(d)=>{wOff=d===0?0:wOff+d;rPanel('planner');};
+window.delEv=(id)=>{S.events=S.events.filter(e=>e.id!==id);sv('events');rPanel('planner');};
+
+function calcStr(hid){let s=0,d=new Date();while(true){const ds=d.toISOString().split('T')[0];if((S.hlog[ds]||[]).includes(hid)){s++;d.setDate(d.getDate()-1);}else break;}return s;}
+function rHabits(){
+  const td=today(),log=S.hlog[td]||[];
+  const last21=[];for(let i=20;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last21.push(d.toISOString().split('T')[0]);}
+  return`<div class="lo-ph"><div class="lo-pt">Habits</div><div class="lo-ps">${log.length}/${S.habits.length} done today</div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><div class="lo-sl" style="margin-bottom:0">Today's habits</div><button class="lo-btn p s" onclick="showM('addHabit')">${IC.plus} New Habit</button></div>
+${S.habits.length?`<div class="lo-card" style="padding:0 1.25rem;margin-bottom:1rem">${S.habits.map(h=>{
+  const dn=log.includes(h.id),str=calcStr(h.id);
+  return`<div class="lo-hr"><button class="lo-hchk${dn?' dn':''}" onclick="togH('${h.id}')">${dn?IC.chk:''}</button><div style="flex:1"><div class="lo-hn">${esc(h.name)}</div>${h.desc?`<div style="font-size:11px;color:var(--color-text-tertiary)">${esc(h.desc)}</div>`:''}</div><div class="lo-hst">${str>0?`🔥 ${str} day${str!==1?'s':''}`:''}</div><button class="lo-del" onclick="delH('${h.id}')">${IC.x}</button></div>`;
+}).join('')}</div>
+<div class="lo-sl">Last 21 days</div>
+<div class="lo-card">${S.habits.map(h=>`<div style="margin-bottom:.875rem"><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:5px">${esc(h.name)}</div><div class="lo-dots">${last21.map(d=>`<div class="lo-dot${(S.hlog[d]||[]).includes(h.id)?' on':''}" title="${d}" style="${d===td?'outline:2px solid #E8782B;outline-offset:1px':''}"></div>`).join('')}</div></div>`).join('')}</div>`
+:`<div class="lo-empty" style="padding-top:3rem"><div style="font-size:36px;opacity:.25;margin-bottom:.75rem">○</div>No habits tracked yet<br><span style="font-size:12px">Build consistency — add your first habit</span></div>`}`;
+}
+window.togH=function(id){const td=today();if(!S.hlog[td])S.hlog[td]=[];const i=S.hlog[td].indexOf(id);if(i>=0)S.hlog[td].splice(i,1);else S.hlog[td].push(id);sv('hlog');rPanel('habits');};
+window.delH=(id)=>{S.habits=S.habits.filter(h=>h.id!==id);sv('habits');rPanel('habits');};
+
+const NCO={amber:'#E87B2E',teal:'#1D9E75',purple:'#7F77DD',coral:'#D85A30'};
+function rNotes(){
+  return`<div class="lo-ph"><div class="lo-pt">Notes</div><div class="lo-ps">${S.notes.length} note${S.notes.length!==1?'s':''}</div></div>
+<div style="margin-bottom:1rem"><button class="lo-btn p s" onclick="showM('addNote')">${IC.plus} New Note</button></div>
+${S.notes.length?`<div class="lo-ng">${[...S.notes].reverse().map(n=>`<div class="lo-nc" style="border-left:3px solid ${NCO[n.color]||'#E87B2E'}"><button class="lo-del" onclick="delN('${n.id}')">${IC.x}</button><div class="lo-nc-ttl">${esc(n.title)||'Untitled'}</div><div class="lo-nc-body">${esc(n.body)}</div><div class="lo-nc-date">${new Date(n.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div></div>`).join('')}</div>`
+:`<div class="lo-empty" style="padding-top:3rem"><div style="font-size:36px;opacity:.25;margin-bottom:.75rem">—</div>No notes yet<br><span style="font-size:12px">Capture thoughts, ideas, anything</span></div>`}`;
+}
+window.delN=(id)=>{S.notes=S.notes.filter(n=>n.id!==id);sv('notes');rPanel('notes');};
+
+function rTimer(){
+  const t=S.timer,m=String(Math.floor(t.sec/60)).padStart(2,'0'),s=String(t.sec%60).padStart(2,'0');
+  const modes=[{id:'work',l:'Focus',d:t.wd},{id:'short',l:'Short Break',d:t.sd},{id:'long',l:'Long Break',d:t.ld}];
+  return`<div class="lo-ph"><div class="lo-pt">Focus Timer</div><div class="lo-ps">${t.sessions} session${t.sessions!==1?'s':''} completed</div></div>
+<div style="max-width:360px;margin:0 auto">
+<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem">${modes.map(mm=>`<div class="lo-chip${t.mode===mm.id?' ac':''}" onclick="setTMode('${mm.id}')">${mm.l} ${mm.d}m</div>`).join('')}</div>
+<div class="lo-card" style="text-align:center;padding:2rem 1.25rem">
+  <div class="lo-tdisp" id="lo-tdig">${m}:${s}</div>
+  <div class="lo-tmode">${modes.find(x=>x.id===t.mode)?.l||'Focus'}</div>
+  <div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.5rem">
+    <button class="lo-btn s" onclick="resetT()">Reset</button>
+    <button class="lo-btn p" onclick="togT2()" id="lo-tbtn" style="min-width:80px">${t.running?'Pause':'Start'}</button>
+  </div>
+</div>
+<div class="lo-card" style="margin-top:.75rem">
+  <div class="lo-sl">Duration settings</div>
+  <div class="lo-g3">
+    <div><label class="lo-fl">Focus (min)</label><input type="number" class="li" value="${t.wd}" min="1" max="90" onchange="setTDur('wd',this.value)"></div>
+    <div><label class="lo-fl">Short break</label><input type="number" class="li" value="${t.sd}" min="1" max="30" onchange="setTDur('sd',this.value)"></div>
+    <div><label class="lo-fl">Long break</label><input type="number" class="li" value="${t.ld}" min="1" max="60" onchange="setTDur('ld',this.value)"></div>
+  </div>
+</div>
+<div style="display:flex;gap:.75rem;margin-top:.75rem;align-items:center">
+  <div style="font-size:12px;color:var(--color-text-secondary)">Work 25 min → short break → repeat 4× → long break</div>
+  <button class="lo-btn s d" onclick="resetSess()">Reset count</button>
+</div></div>`;
+}
+window.setTMode=function(mode){clearInterval(timerIv);timerIv=null;const d={work:S.timer.wd,short:S.timer.sd,long:S.timer.ld};S.timer.mode=mode;S.timer.running=false;S.timer.sec=d[mode]*60;rPanel('timer');};
+window.togT2=function(){
+  if(S.timer.running){clearInterval(timerIv);timerIv=null;S.timer.running=false;const b=document.getElementById('lo-tbtn');if(b)b.textContent='Start';}
+  else{clearInterval(timerIv);timerIv=null;S.timer.running=true;const b=document.getElementById('lo-tbtn');if(b)b.textContent='Pause';
+    timerIv=setInterval(()=>{
+      if(S.timer.sec>0){S.timer.sec--;const m=String(Math.floor(S.timer.sec/60)).padStart(2,'0'),s=String(S.timer.sec%60).padStart(2,'0');const el=document.getElementById('lo-tdig');if(el)el.textContent=`${m}:${s}`;}
+      else{clearInterval(timerIv);timerIv=null;S.timer.running=false;if(S.timer.mode==='work'){S.timer.sessions++;svk('lo2_tsess',S.timer.sessions);}
+        alert(S.timer.mode==='work'?'Focus session complete! Take a well-earned break.':'Break over! Time to focus.');rPanel('timer');}
+    },1000);}
+};
+window.resetT=function(){clearInterval(timerIv);timerIv=null;S.timer.running=false;const d={work:S.timer.wd,short:S.timer.sd,long:S.timer.ld};S.timer.sec=d[S.timer.mode]*60;rPanel('timer');};
+window.setTDur=(k,v)=>{S.timer[k]=Math.max(1,parseInt(v)||1);};
+window.resetSess=()=>{S.timer.sessions=0;svk('lo2_tsess',0);rPanel('timer');};
+
+window.showM=function(type,pre){
+  const ms={addTask:mTask,addGoal:mGoal,addEvent:()=>mEvent(pre),addHabit:mHabit,addNote:mNote};
+  const h=ms[type]?.();if(!h)return;
+  const o=document.createElement('div');o.className='lo-mbg';o.id='lo-modal';o.innerHTML=h;
+  o.onclick=e=>{if(e.target===o)clsM();};
+  document.body.appendChild(o);
+};
+window.clsM=()=>{const m=document.getElementById('lo-modal');if(m)m.remove();};
+
+function mTask(){return`<div class="lo-modal"><div class="lo-mtitle">New Task</div>
+<div class="lo-fg"><label class="lo-fl">Title *</label><input class="li" id="t-ti" placeholder="What needs to be done?"></div>
+<div class="lo-fr"><div class="lo-fg"><label class="lo-fl">Category</label><select class="li" id="t-ca"><option value="">None</option>${['Work','Personal','Health','Finance','Learning','Creative'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+<div class="lo-fg"><label class="lo-fl">Priority</label><select class="li" id="t-pr"><option value="">None</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div></div>
+<div class="lo-fg"><label class="lo-fl">Due Date</label><input type="date" class="li" id="t-du"></div>
+<div class="lo-fg"><label class="lo-fl">Notes (optional)</label><textarea class="li" id="t-no" style="min-height:56px" placeholder="Add context..."></textarea></div>
+<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem"><button class="lo-btn s" onclick="clsM()">Cancel</button><button class="lo-btn p s" onclick="svTask()">Add Task</button></div></div>`;}
+window.svTask=function(){const ti=document.getElementById('t-ti')?.value?.trim();if(!ti)return;S.tasks.push({id:uid(),title:ti,cat:document.getElementById('t-ca')?.value||'',priority:document.getElementById('t-pr')?.value||'',due:document.getElementById('t-du')?.value||'',notes:document.getElementById('t-no')?.value||'',done:false,ts:Date.now()});sv('tasks');clsM();rPanel(S.cur);};
+
+function mGoal(){return`<div class="lo-modal"><div class="lo-mtitle">New Goal for 2026</div>
+<div class="lo-fg"><label class="lo-fl">Goal *</label><input class="li" id="g-ti" placeholder="What do you want to achieve?"></div>
+<div class="lo-fg"><label class="lo-fl">Why this matters</label><textarea class="li" id="g-de" placeholder="Your motivation..."></textarea></div>
+<div class="lo-fr"><div class="lo-fg"><label class="lo-fl">Category</label><select class="li" id="g-ca"><option value="">None</option>${['Career','Health','Finance','Learning','Personal','Relationships','Creative'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+<div class="lo-fg"><label class="lo-fl">Target date</label><input type="date" class="li" id="g-dl"></div></div>
+<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem"><button class="lo-btn s" onclick="clsM()">Cancel</button><button class="lo-btn p s" onclick="svGoal()">Add Goal</button></div></div>`;}
+window.svGoal=function(){const ti=document.getElementById('g-ti')?.value?.trim();if(!ti)return;S.goals.push({id:uid(),title:ti,desc:document.getElementById('g-de')?.value||'',cat:document.getElementById('g-ca')?.value||'',dl:document.getElementById('g-dl')?.value||'',p:0,ts:Date.now()});sv('goals');clsM();rPanel(S.cur);};
+
+function mEvent(pre){return`<div class="lo-modal"><div class="lo-mtitle">New Event</div>
+<div class="lo-fg"><label class="lo-fl">Title *</label><input class="li" id="e-ti" placeholder="Event name..."></div>
+<div class="lo-fr"><div class="lo-fg"><label class="lo-fl">Date</label><input type="date" class="li" id="e-dt" value="${pre||today()}"></div>
+<div class="lo-fg"><label class="lo-fl">Time</label><input type="time" class="li" id="e-tm"></div></div>
+<div class="lo-fg"><label class="lo-fl">Type</label><select class="li" id="e-ty"><option value="reminder">Reminder</option><option value="work">Work</option><option value="personal">Personal</option><option value="health">Health</option></select></div>
+<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem"><button class="lo-btn s" onclick="clsM()">Cancel</button><button class="lo-btn p s" onclick="svEvent()">Add Event</button></div></div>`;}
+window.svEvent=function(){const ti=document.getElementById('e-ti')?.value?.trim();if(!ti)return;S.events.push({id:uid(),title:ti,date:document.getElementById('e-dt')?.value||today(),time:document.getElementById('e-tm')?.value||'',type:document.getElementById('e-ty')?.value||'reminder',ts:Date.now()});sv('events');clsM();rPanel(S.cur);};
+
+function mHabit(){return`<div class="lo-modal"><div class="lo-mtitle">New Habit</div>
+<div class="lo-fg"><label class="lo-fl">Habit name *</label><input class="li" id="h-na" placeholder="e.g. Morning workout, Read 20 min..."></div>
+<div class="lo-fg"><label class="lo-fl">Description (optional)</label><input class="li" id="h-de" placeholder="Brief description..."></div>
+<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem"><button class="lo-btn s" onclick="clsM()">Cancel</button><button class="lo-btn p s" onclick="svHabit()">Add Habit</button></div></div>`;}
+window.svHabit=function(){const na=document.getElementById('h-na')?.value?.trim();if(!na)return;S.habits.push({id:uid(),name:na,desc:document.getElementById('h-de')?.value||'',ts:Date.now()});sv('habits');clsM();rPanel(S.cur);};
+
+function mNote(){return`<div class="lo-modal"><div class="lo-mtitle">New Note</div>
+<div class="lo-fg"><label class="lo-fl">Title</label><input class="li" id="n-ti" placeholder="Note title..."></div>
+<div class="lo-fg"><label class="lo-fl">Content *</label><textarea class="li" id="n-bo" style="min-height:120px" placeholder="Write anything..."></textarea></div>
+<div class="lo-fg"><label class="lo-fl">Color</label><div style="display:flex;gap:8px">${Object.entries(NCO).map(([c,hex])=>`<div onclick="selNC('${c}')" id="nc-${c}" style="width:24px;height:24px;border-radius:50%;background:${hex};cursor:pointer;border:2px solid ${c==='amber'?'#1a1a18':'transparent'};transition:border .12s"></div>`).join('')}</div></div>
+<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem"><button class="lo-btn s" onclick="clsM()">Cancel</button><button class="lo-btn p s" onclick="svNote()">Save Note</button></div></div>`;}
+window.selNC=function(c){_nc=c;Object.keys(NCO).forEach(x=>{const el=document.getElementById('nc-'+x);if(el)el.style.border=x===c?'2px solid #1a1a18':'2px solid transparent';});};
+window.svNote=function(){const bo=document.getElementById('n-bo')?.value?.trim();if(!bo)return;S.notes.push({id:uid(),title:document.getElementById('n-ti')?.value?.trim()||'',body:bo,color:_nc,ts:Date.now()});sv('notes');clsM();rPanel(S.cur);};
+
+function init(){
+  document.getElementById('lo-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const yp=yrp();
+  document.getElementById('lo-yp').textContent=yp+'%';
+  document.getElementById('lo-yf').style.width=yp+'%';
+  loadAll();
+  bNav();
+  rPanel(S.cur);
+}
+init();
+})();
+</script>
+</body>
+</html>
