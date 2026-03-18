@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LifeOS — Release Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --f:'Plus Jakarta Sans',-apple-system,sans-serif;
+  --bg:#F7F6F2;--bg1:#fff;--bg2:#EFEDE8;--bg3:#E4E1DA;
+  --t1:#1A1710;--t2:#6A6458;--t3:#A09890;
+  --ac:#FF5F1F;--acb:#FFF0E8;--act:#BF3A00;
+  --gr:#15803D;--grb:#ECFDF5;
+  --re:#DC2626;--reb:#FFF1F0;
+  --am:#B45309;--amb:#FFFBEB;
+  --pu:#6D28D9;--pub:#EDE9FE;
+  --bd:rgba(26,23,16,.08);--bd2:rgba(26,23,16,.14);
+  --s1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --s2:0 8px 32px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.05);
+  --r:14px;--rs:8px;
+}
+html,body{font-family:var(--f);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh}
+body{padding:3rem 1.5rem 5rem}
+.wrap{max-width:720px;margin:0 auto}
+
+/* HERO */
+.hero{margin-bottom:3rem;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--acb);color:var(--act);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 14px;border-radius:999px;border:1px solid rgba(255,95,31,.2);margin-bottom:1.25rem}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--ac);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.hero-title{font-size:clamp(36px,6vw,52px);font-weight:800;letter-spacing:-.05em;line-height:1.05;color:var(--t1);margin-bottom:.75rem}
+.hero-title span{color:var(--ac)}
+.hero-sub{font-size:16px;color:var(--t2);line-height:1.65;max-width:520px;margin:0 auto 1.5rem}
+.hero-meta{display:flex;align-items:center;justify-content:center;gap:1.25rem;flex-wrap:wrap}
+.hmeta{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--t3);font-weight:500}
+.hmeta-ic{font-size:14px}
+.ver-pill{display:inline-flex;align-items:center;padding:6px 18px;border-radius:999px;background:var(--t1);color:var(--bg1);font-size:13px;font-weight:700;letter-spacing:.04em}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--bd);margin:2.5rem 0}
+
+/* SECTION */
+.section{margin-bottom:2.5rem}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem}
+.sec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sec-ic-new{background:var(--acb)}
+.sec-ic-fix{background:var(--grb)}
+.sec-ic-imp{background:var(--pub)}
+.sec-ic-rem{background:var(--reb)}
+.sec-title{font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.04em}
+.sec-count{font-size:12px;font-weight:700;color:var(--t3);background:var(--bg3);padding:2px 9px;border-radius:999px;margin-left:6px}
+
+/* UPDATE CARDS */
+.ucards{display:flex;flex-direction:column;gap:.625rem}
+.uc{background:var(--bg1);border:1px solid var(--bd);border-radius:var(--r);padding:1rem 1.25rem 1rem 1rem;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--s1);transition:box-shadow .15s,border-color .15s;border-left:3px solid transparent}
+.uc:hover{box-shadow:var(--s2);border-color:var(--bd2)}
+.uc.new{border-left-color:var(--ac)}
+.uc.fix{border-left-color:var(--gr)}
+.uc.imp{border-left-color:var(--pu)}
+.uc.rem{border-left-color:var(--re)}
+.uc-badge{flex-shrink:0;margin-top:2px;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.ub-new{background:var(--acb);color:var(--act)}
+.ub-fix{background:var(--grb);color:var(--gr)}
+.ub-imp{background:var(--pub);color:var(--pu)}
+.ub-rem{background:var(--reb);color:var(--re)}
+.uc-body{flex:1;min-width:0}
+.uc-title{font-size:14px;font-weight:700;color:var(--t1);line-height:1.35;margin-bottom:4px}
+.uc-desc{font-size:12.5px;color:var(--t2);line-height:1.55}
+
+/* SUMMARY BAR */
+.sumbar{background:var(--bg1);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem 1.5rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;box-shadow:var(--s1);margin-bottom:2.5rem;text-align:center}
+.sm{padding:.5rem .25rem}
+.sm-num{font-size:26px;font-weight:800;letter-spacing:-.05em;line-height:1}
+.sm-lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-top:4px}
+.sm-new .sm-num{color:var(--ac)}
+.sm-fix .sm-num{color:var(--gr)}
+.sm-imp .sm-num{color:var(--pu)}
+.sm-rem .sm-num{color:var(--re)}
+
+/* FOOTER */
+.footer{text-align:center;padding-top:2rem;border-top:1px solid var(--bd)}
+.footer-brand{display:inline-flex;align-items:center;gap:9px;margin-bottom:.75rem}
+.footer-mark{width:28px;height:28px;border-radius:8px;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:15px}
+.footer-name{font-size:15px;font-weight:800;letter-spacing:-.04em}
+.footer-by{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.footer-author{font-size:13px;font-weight:700;color:var(--t2)}
+.footer-role{font-size:12px;color:var(--t3);margin-top:2px}
+
+@media(max-width:540px){
+  .sumbar{grid-template-columns:repeat(2,1fr)}
+  .hero-title{font-size:32px}
+  .uc{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><span class="hero-badge-dot"></span> Version 4.0 — Final Release</div>
+    <h1 class="hero-title">LifeOS<br><span>Update Notes</span></h1>
+    <p class="hero-sub">A full breakdown of every feature added, bug fixed, and improvement shipped across all development sessions.</p>
+    <div class="hero-meta">
+      <span class="hmeta"><span class="hmeta-ic">📅</span> March 2026</span>
+      <span class="ver-pill">⚡ v4.0 Final</span>
+      <span class="hmeta"><span class="hmeta-ic">🗂</span> Single HTML app</span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="sumbar">
+    <div class="sm sm-new"><div class="sm-num">12</div><div class="sm-lbl">New features</div></div>
+    <div class="sm sm-fix"><div class="sm-num">6</div><div class="sm-lbl">Bugs fixed</div></div>
+    <div class="sm sm-imp"><div class="sm-num">8</div><div class="sm-lbl">Improvements</div></div>
+    <div class="sm sm-rem"><div class="sm-num">3</div><div class="sm-lbl">Removed</div></div>
+  </div>
+
+  <!-- NEW FEATURES -->
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-icon sec-ic-new">🚀</div>
+      <div>
+        <span class="sec-title">New Features</span>
+        <span class="sec-count">12</span>
+      </div>
+    </div>
+    <div class="ucards">
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Personalised Welcome Screen</div>
+          <div class="uc-desc">A full-screen onboarding popup greets new users, asks for their name, and stores it. The app uses this name in all dashboard greetings and the sidebar footer. Returning users skip straight to their app.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Goal Fireworks Celebration</div>
+          <div class="uc-desc">Dragging a goal's progress slider to 100% triggers a full-screen multi-burst confetti animation with a trophy banner. Particles use gravity physics and varied shapes. The celebration includes the goal's title and can be dismissed manually.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Dark / Light Mode Toggle</div>
+          <div class="uc-desc">A sun/moon button in the top bar switches between light and dark themes. Automatically detects the system preference on first load. Every surface, badge, shadow, and semantic color adapts seamlessly. Preference is saved to localStorage.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Planner Event Alarms</div>
+          <div class="uc-desc">Events can now have alarms toggled on when created. A background checker runs every 30 seconds and fires on the exact scheduled minute with a triple-beep audio tone via Web Audio API, an in-app popup notification, and a native browser push notification (when permitted).</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Clear All Button on Every Page</div>
+          <div class="uc-desc">Each section — Tasks, Goals, Planner, Habits, and Notes — now has a red "Clear All" button in its action bar. Each asks for confirmation before wiping. Clearing Habits also wipes the full check-log history since there's nothing to track without the habits themselves.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Expanded Quote Library (60+)</div>
+          <div class="uc-desc">The daily motivational quote pool grew from 12 to over 60 entries, sourced from athletes, entrepreneurs, authors, and philosophers. Quotes cycle on a deterministic daily formula so each day reliably shows a different quote.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">In-App Toast Notifications</div>
+          <div class="uc-desc">A non-blocking toast bar now appears at the bottom-right to confirm actions — focus timer completions, alarm permissions granted, and session resets — without interrupting the user's flow.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Focus Timer Audio Feedback</div>
+          <div class="uc-desc">When a Pomodoro session finishes, a short two-tone chime plays via Web Audio API to alert the user even if they're not looking at the screen. No external sound files required.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Priority Color-Coded Task Borders</div>
+          <div class="uc-desc">Task list items now have a left-edge color indicator — red for high priority, amber for medium, green for low — so urgency is immediately visible without reading the badge.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Goal Category Icons</div>
+          <div class="uc-desc">Each goal card now shows an emoji icon based on its category (💼 Career, 💪 Health, 💰 Finance, 📚 Learning, 🌱 Personal, ❤️ Relationships, 🎨 Creative). Goals with no category default to 🎯.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Notification Permission Banner in Planner</div>
+          <div class="uc-desc">If browser notifications are not yet enabled, the Planner shows a contextual banner with a one-click "Enable Alarms" button. If notifications are blocked entirely, a different message explains the fallback to in-app popups.</div>
+        </div>
+      </div>
+
+      <div class="uc new">
+        <span class="uc-badge ub-new">New</span>
+        <div class="uc-body">
+          <div class="uc-title">Time-Aware Dashboard Greeting</div>
+          <div class="uc-desc">The dashboard greeting changes based on the current hour — morning, afternoon, evening, and late-night variants — and addresses the user by their chosen name for a personalised experience.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BUG FIXES -->
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-icon sec-ic-fix">🔧</div>
+      <div>
+        <span class="sec-title">Bug Fixes</span>
+        <span class="sec-count">6</span>
+      </div>
+    </div>
+    <div class="ucards">
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">Habits Disappearing After Being Checked</div>
+          <div class="uc-desc">Checking a habit caused the entire panel to re-render, which wiped habits from the visible list despite the data still being stored. The toggle now surgically updates only that row's checkbox state without a full re-render — habits are always visible.</div>
+        </div>
+      </div>
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">Habit Counter Not Resetting When Habit Is Deleted</div>
+          <div class="uc-desc">Deleting a habit left its ID in every date entry of the check-log (hlog), so the done counter kept counting it even though the habit was gone. Deletion now scrubs the ID from the entire hlog before saving.</div>
+        </div>
+      </div>
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">Hardcoded Footer Showing Short Name</div>
+          <div class="uc-desc">The sidebar footer was showing only "Ahmed" because a JavaScript line was overwriting the hardcoded HTML with whatever name was typed at the welcome screen. The footer is now fully hardcoded in HTML and no JS can overwrite it.</div>
+        </div>
+      </div>
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">Streak Counter Showing Wrong Value After Unchecking</div>
+          <div class="uc-desc">The streak calculation walked backwards from today using the previous state of the log, not the updated one. The function now reads directly from the freshly mutated hlog copy, so streaks always reflect the current state.</div>
+        </div>
+      </div>
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">File Not Saving to Outputs Directory</div>
+          <div class="uc-desc">A previous build was silently failing to write to /mnt/user-data/outputs, meaning users were downloading a stale version. The build process was corrected and validated with a Node.js syntax check before delivery.</div>
+        </div>
+      </div>
+
+      <div class="uc fix">
+        <span class="uc-badge ub-fix">Fixed</span>
+        <div class="uc-body">
+          <div class="uc-title">AlarmFired Flag Not Resetting on New Day</div>
+          <div class="uc-desc">Once an alarm fired, its alarmFired flag was never reset, so recurring events on future dates would never alarm again. On app init, all events with alarmFired = true where date is in the past are now reset.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- IMPROVEMENTS -->
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-icon sec-ic-imp">✨</div>
+      <div>
+        <span class="sec-title">Improvements</span>
+        <span class="sec-count">8</span>
+      </div>
+    </div>
+    <div class="ucards">
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Fully Responsive on All Screen Sizes</div>
+          <div class="uc-desc">The sidebar now collapses off-screen on mobile with a hamburger menu and backdrop overlay. Metric grids, navigation cards, and note grids all collapse to 2-column or single-column layouts on smaller screens. The planner week grid has a minimum width with horizontal scroll on phones.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Dashboard Focused on Overview Only</div>
+          <div class="uc-desc">The dashboard was previously mixing other sections' actions inline. It is now a pure overview with live stats, year progress, quote, and jump-to navigation cards only. Each page owns its own actions exclusively.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Senior-Level Task List Design</div>
+          <div class="uc-desc">Tasks are sorted by priority then due date. Completed tasks drop to the bottom. Each row has a left-border priority indicator, smooth animated checkbox, hover-reveal delete button, and graceful text truncation with ellipsis for long notes.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Motivational Microcopy Throughout</div>
+          <div class="uc-desc">Timer completion messages are now personality-rich ("You just leveled up. 💪"). Goal deletion prompts are firm. Empty states have motivational taglines. The year progress bar includes a days-remaining motivational line.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Goal Progress Bar Updates Live</div>
+          <div class="uc-desc">Dragging the progress slider no longer requires a full panel re-render. The bar width and percentage label update in real time as the slider moves, then fireworks trigger asynchronously only when 100% is reached.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Habits 21-Day History Dot Updates Instantly</div>
+          <div class="uc-desc">The habit history dots for today's date now toggle on/off in sync with the checkbox via DOM attribute selectors, with no re-render needed. The "today" dot also has an orange ring outline to distinguish it from past days.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Planner Events Sorted by Time</div>
+          <div class="uc-desc">Events in each day column are now sorted chronologically by their time field so the day's schedule reads top-to-bottom in order. Events with alarms show an ⏰ indicator in the pill.</div>
+        </div>
+      </div>
+
+      <div class="uc imp">
+        <span class="uc-badge ub-imp">Improved</span>
+        <div class="uc-body">
+          <div class="uc-title">Nav Badges Show Real-Time Counts</div>
+          <div class="uc-desc">The sidebar Tasks badge shows the live count of active (non-done) tasks. The Habits badge shows today's check ratio (e.g. 2/5). Both update immediately after any action — no page navigation required.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REMOVED -->
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-icon sec-ic-rem">🗑</div>
+      <div>
+        <span class="sec-title">Removed</span>
+        <span class="sec-count">3</span>
+      </div>
+    </div>
+    <div class="ucards">
+
+      <div class="uc rem">
+        <span class="uc-badge ub-rem">Removed</span>
+        <div class="uc-body">
+          <div class="uc-title">Cross-Page Actions on Dashboard</div>
+          <div class="uc-desc">The old dashboard contained "New Task", "My Goals", and "Planner" buttons that duplicated actions from other pages. These have been removed in favour of clean navigation cards that jump to each section.</div>
+        </div>
+      </div>
+
+      <div class="uc rem">
+        <span class="uc-badge ub-rem">Removed</span>
+        <div class="uc-body">
+          <div class="uc-title">Dynamic Sidebar Author Name</div>
+          <div class="uc-desc">The author credit was previously being overwritten at runtime by the user's welcome-screen name input. The dynamic update has been removed — the credit is now a static HTML element that never changes.</div>
+        </div>
+      </div>
+
+      <div class="uc rem">
+        <span class="uc-badge ub-rem">Removed</span>
+        <div class="uc-body">
+          <div class="uc-title">Alert() Dialogs for Timer Completion</div>
+          <div class="uc-desc">Blocking browser alert() dialogs were replaced with non-blocking toast notifications and audio feedback so the timer page re-renders cleanly without the user needing to click away an interrupting modal.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-mark">⚡</div>
+      <span class="footer-name">LifeOS</span>
+    </div>
+    <div class="footer-by">Done by</div>
+    <div class="footer-author">Ahmed Ezz Eldin Elaraby</div>
+    <div class="footer-role">4th year &middot; CSC</div>
+  </div>
+
+</div>
+</body>
+</html>
